@@ -1,0 +1,103 @@
+
+cd $HOME
+mkdir .sui
+mv $HOME/sui/fullnode.yaml $HOME/.sui/
+mv $HOME/.cargo/bin/sui-node /usr/local/bin/
+2
+
+mv $HOME/sui/fullnode.yaml $HOME/.sui/
+User=$USER
+Type=singgle
+ExecStart=/usr/local/bin/sui-node --config-path $HOME/.sui/fullnode.yaml
+Restart=on-failure
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target" > $HOME/suid.service
+
+3
+echo "[Unit]
+Description=Sui Node
+After=network.target
+
+4
+
+sudo tee <<EOF >/dev/null /etc/systemd/journald.conf
+Storage=persistent
+EOF
+
+5
+
+kill screen suid
+sudo systemctl restart systemd-journald
+sudo systemctl daemon-reload
+sudo systemctl enable suid
+sudo systemctl restart suid
+journalctl -u suid -f
+
+User=$USER
+Type=singgle
+ExecStart=/usr/local/bin/sui-node --config-path $HOME/.sui/fullnode.yaml
+Restart=on-failure
+LimitNOFILE=65535
+
+
+
+ExecStart=/usr/local/bin/sui-node --config-path $HOME/.sui/fullnode.yaml
+Restart=on-failure
+LimitNOFILE=65535
+
+
+6
+
+rm $HOME/.sui/fullnode.yaml
+
+cp $HOME/sui/crates/sui-config/data/fullnode-template.yaml $HOME/.sui/fullnode.yaml
+
+sed -i.bak "s|db-path:.*|db-path: \"$HOME\/.sui\/db\"| ; s|genesis-file-location:.*|genesis-file-location: \"$HOME\/.sui\/genesis.blob\"| ; s|127.0.0.1|0.0.0.0|" $HOME/.sui/fullnode.yaml
+
+sudo tee -a $HOME/.sui/fullnode.yaml  >/dev/null <<EOF
+
+p2p-config:
+  seed-peers:
+   - address: "/ip4/95.217.57.232/udp/8080"
+   - address: "/ip4/15.204.163.225/udp/8080"
+kill screen suid
+sudo systemctl restart systemd-journald
+sudo systemctl daemon-reload
+sudo systemctl enable suid
+sudo systemctl restart suid
+journalctl -u suid -f
+EOF
+
+7
+
+sudo systemctl restart suid
+- address: "/ip4/95.217.57.232/udp/8080"
+   - address: "/ip4/15.204.163.225/udp/8080
+8
+kill screen suid
+sudo systemctl restart systemd-journald
+sudo systemctl daemon-reload
+sudo systemctl enable suid
+sudo systemctl restart suid
+journalctl -u suid -f
+@gem_gym
+echo "[Unit]
+Description=Sui Node
+After=network.target
+
+
+User=$USER
+Type=singgle
+ExecStart=/usr/local/bin/sui-node --config-path $HOME/.sui/fullnode.yaml
+Restart=on-failure
+LimitNOFILE=65535
+
+kill screen suid
+sudo systemctl restart systemd-journald
+sudo systemctl daemon-reload
+sudo systemctl enable suid
+sudo systemctl restart suid
+journalctl -u suid -f
+

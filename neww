@@ -4,7 +4,11 @@ mkdir .sui
 mv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
 2
-
+cd $HOME
+mkdir .sui
+mv $HOME/sui/fullnode.yaml $HOME/.sui/
+mv $HOME/.cargo/bin/sui-node /usr/local/bin/
+2
 mv $HOME/sui/fullnode.yaml $HOME/.sui/
 User=$USER
 Type=singgle

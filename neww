@@ -1,4 +1,4 @@
-
+mv $HOME/.cargo/bin/sui-node /usr/local/bin/
 cd $HOME
 mkdir .sui
 mv $HOME/sui/fullnode.yaml $HOME/.sui/

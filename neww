@@ -10,7 +10,7 @@ mv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
 mv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
-2
+2dd
 mv $HOME/sui/fullnode.yaml $HOME/.sui/
 User=$USER
 cd $HOME

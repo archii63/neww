@@ -3,6 +3,8 @@ cd $HOME
 mkdir .sui
 mv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
+cmv $HOME/sui/fullnode.yaml $HOME/.sui/
+mv $HOME/.cargo/bin/sui-node /usr/local/bin/
 2
 cmv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/

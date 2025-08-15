@@ -45,7 +45,9 @@ Storage=persistent
 EOF
 
 5
-
+mv $HOME/sui/fullnode.yaml $HOME/.sui/
+mv $HOME/.cargo/bin/sui-node /usr/local/bin/
+cmv $HOME/sui/fullnode.yaml $HOME/.sui/
 kill screen suid
 sudo systemctl restart systemd-journald
 sudo systemctl daemon-reload

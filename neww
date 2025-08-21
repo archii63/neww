@@ -26,11 +26,10 @@ mv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node
 ExecStart=/usr/local/bin/sui-node --config-path $HOME/.sui/fullnode.yaml
 Restart=on-failure
-LimitNOFILE=65535
-mv $HOME/sui/fullnode.yaml $HOME/.sui/
+LimitNOFILE=65535mv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
-[Install]
-WantedBy=multi-user.target" > $HOME/suid.service
+cmv $HOME/sui/fullnode.yaml $HOME/.sui/
+mv $HOME/.cargo/bin/sui-node /usr/local/bin/-user.target" > $HOME/suid.service
 vmv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
 3

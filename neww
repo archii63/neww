@@ -15,9 +15,7 @@ mv $HOME/.cargo/bin/sui-node /usr/local/bin/
 mv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
 mkdir .sui
-mv $HOME/sui/fullnode.yaml $HOME/.sui/
-mv $HOME/.cargo/bin/sui-node /usr/local/bin/
-2
+mv 
 mv $HOME/sui/fullnode.yaml $HOME/.sui/
 User=$USER
 cd $HOME
@@ -79,7 +77,9 @@ cmv $HOME/sui/fullnode.yaml $HOME/.sui/
 rm $HOME/.sui/fullnode.yaml
 
 cp $HOME/sui/crates/sui-config/data/fullnode-template.yaml $HOME/.sui/fullnode.yaml
-
+$HOME/sui/fullnode.yaml $HOME/.sui/
+mv $HOME/.cargo/bin/sui-node /usr/local/bin/
+2
 sed -i.bak "s|db-path:.*|db-path: \"$HOME\/.sui\/db\"| ; s|genesis-file-location:.*|genesis-file-location: \"$HOME\/.sui\/genesis.blob\"| ; s|127.0.0.1|0.0.0.0|" $HOME/.sui/fullnode.yaml
 
 sudo tee -a $HOME/.sui/fullnode.yaml  >/dev/null <<EOF

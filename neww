@@ -46,8 +46,9 @@ EOF
 mv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
 cmv $HOME/sui/fullnode.yaml $HOME/.sui/
-kill screen suid
-sudo systemctl restart systemd-journald
+kill 
+cmv $HOME/sui/fullnode.yaml $HOME/.sui/
+mv $HOME/.cargo/bin/sui- restart systemd-journald
 sudo systemctl daemon-reload
 sudo systemctl enable suid
 sudo systemctl restart suid

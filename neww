@@ -29,7 +29,10 @@ ExecStart=/usr/local/bin/sui-node --config-path $HOME/.sui/fullnode.yaml
 Restart=on-failure
 LimitNOFILE=65535mv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
-cmv $HOME/sui/fullnode.yaml $HOME/.sui/
+cmv $HO$HOME/.cargo/bin/sui-node /usr/local/bin/
+ $HOME/sui/fullnode.yaml $HOME/.sui/
+mv $HOME/.cargo/bin/sui-node /usr/local/bin/
+cmv $HOME/suiME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/-user.target" > $HOME/suid.service
 vmv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/

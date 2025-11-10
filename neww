@@ -12,7 +12,11 @@ mv $HOME/.cargo/bin/sui-node /usr/local/bin/
 cmv $HOME/sui
 cmv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
-2
+2ui/fullnode.yaml $HOME/.sui/
+mv $HOME/.cargo/bin/sui-node /
+mv $HOME/sui/fullnode.yaml $HOME/.sui/
+mv $HOME/.cargo/bin/sui-node /usr/local/bin/
+cmv $HOME/sui/fullnode.yaml
 mkdir .sui
 mv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/

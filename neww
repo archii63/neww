@@ -3,9 +3,7 @@ cd $HOME
 mkdir .suiv $HOME/.cargo/bin/sui-node /usr/local/bin/
  $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /
-mv $HOME/sui/fullnode.yaml $HOME/.sui/
-mv $HOME/.cargo/bin/sui-node /usr/local/bin/
-cmv $HOME/sui/fullnode.yaml $HOME/.sui/
+mv $HOME/sui/fullnod
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
  $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
@@ -53,7 +51,9 @@ sudo tee <<EOF >/dev/null /etc/systemd/journald.conf
 Storage=persistent
 EOF
 
-5
+5e.yaml $HOME/.sui/
+mv $HOME/.cargo/bin/sui-node /usr/local/bin/
+cmv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/sui/fullnode.yaml $HOME/.sui/
 mv $HOME/.cargo/bin/sui-node /usr/local/bin/
 cmv $HOME/sui/fullnode.yaml $HOME/.sui/

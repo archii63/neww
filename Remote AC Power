@@ -1,0 +1,244 @@
+# Remote AC Power — Example
+
+Two example approaches to remotely turn on an air conditioner:
+
+- **Smart plug / smart switch + MQTT** (recommended)
+- **ESP32 IR blaster + MQTT** (for IR remote ACs)
+
+## Files
+- `server/index.js` — Node.js webhook server that publishes MQTT messages.
+- `esp32/aircon.ino` — ESP32 code (Arduino) that subscribes to MQTT and toggles the AC (via a relay or IR).
+
+## Prereqs
+- An MQTT broker (local Mosquitto or cloud broker like HiveMQ, CloudMQTT).
+- Node.js (v16+) to run the webhook server.
+- ESP32 board and Arduino IDE (or PlatformIO).
+- If using a smart plug, flash it with Tasmota or use a model with local MQTT support (or use the vendor's local API).
+
+## How it works
+1. Send an HTTP POST to the webhook server (`/ac/on`) with JSON `{ "zone": "livingroom" }`.
+2. Server publishes MQTT topic `home/ac/<zone>/power` with payload `ON`.
+3. ESP32 or smart plug subscribed to that topic receives the message and turns the AC on.
+
+## Security
+- Use TLS for the webhook and for your MQTT broker (username/password).
+- Limit access to the webhook (API key, basic auth or JWT).
+- Do not control mains devices unless you know safe wiring practices. Prefer certified smart plugs.
+// Minimal webhook that publishes MQTT messages
+// Usage: npm init -y && npm i express mqtt body-parser
+// Start: node index.js
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const mqtt = require('mqtt');
+
+const app = express();
+app.use(bodyParser.json());
+
+// Load config from env vars for GitHub-friendly deployment
+const MQTT_URL = process.env.MQTT_URL || 'mqtt://localhost:1883';
+const MQTT_USER = process.env.MQTT_USER || '';
+const MQTT_PASS = process.env.MQTT_PASS || '';
+const PORT = process.env.PORT || 3000;
+const API_KEY = process.env.API_KEY || 'supersecret'; // change in prod
+
+const mqttOptions = {};
+if (MQTT_USER) mqttOptions.username = MQTT_USER;
+if (MQTT_PASS) mqttOptions.password = MQTT_PASS;
+
+const client = mqtt.connect(MQTT_URL, mqttOptions);
+
+client.on('connect', () => {
+  console.log('Connected to MQTT broker', MQTT_URL);
+});
+
+client.on('error', (err) => {
+  console.error('MQTT error', err);
+});
+
+function publishPower(zone, state) {
+  const topic = `home/ac/${zone}/power`;
+  const payload = state ? 'ON' : 'OFF';
+  client.publish(topic, payload, { qos: 1, retain: false }, (err) => {
+    if (err) console.error('Publish error', err);
+    else console.log(`Published ${payload} -> ${topic}`);
+  });
+}
+
+// Simple auth middleware
+function requireApiKey(req, res, next) {
+  const key = req.headers['x-api-key'] || req.query.api_key;
+  if (key !== API_KEY) return res.status(401).json({ error: 'Unauthorized' });
+  next();
+}
+
+app.post('/ac/on', requireApiKey, (req, res) => {
+  const zone = (req.body.zone || 'default').toString();
+  publishPower(zone, true);
+  res.json({ status: 'ok', zone, action: 'on' });
+});
+
+app.post('/ac/off', requireApiKey, (req, res) => {
+  const zone = (req.body.zone || 'default').toString();
+  publishPower(zone, false);
+  res.json({ status: 'ok', zone, action: 'off' });
+});
+
+app.get('/', (req, res) => {
+  res.send('AC webhook running');
+});
+
+app.listen(PORT, () => {
+  console.log(`Server listening on ${PORT}`);
+});
+// ESP32 MQTT client for turning AC ON/OFF
+// Install libs: PubSubClient, WiFi, IRremoteESP8266 (if using IR)
+// In Arduino IDE: Sketch -> Include Library -> Manage Libraries
+// Replace SSID/PASS, MQTT config before uploading (or use SPIFFS for config)
+
+#include <WiFi.h>
+#include <PubSubClient.h>
+
+// Optional: for IR mode
+// #include <IRremoteESP8266.h>
+// #include <IRsend.h>
+
+// --------- CONFIG ---------
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+const char* mqtt_server = "192.168.1.50"; // or cloud broker address
+const int mqtt_port = 1883;
+const char* mqtt_user = "mqttuser";
+const char* mqtt_pass = "mqttpass";
+
+const char* zone = "livingroom";
+const char* topic = "home/ac/livingroom/power";
+
+// Mode selection: uncomment one
+#define SMART_PLUG_MODE
+// #define IR_MODE
+
+// SMART_PLUG_MODE: use a relay or smart-switch input pin
+#ifdef SMART_PLUG_MODE
+const int RELAY_PIN = 2; // change to your GPIO
+#endif
+
+// IR_MODE: configure IR send pin & code
+#ifdef IR_MODE
+// const uint16_t kIrLedPin = 4;
+// IRsend irsend(kIrLedPin);
+// // Example: NEC code (replace with actual AC code and protocol)
+// const unsigned long AC_IR_CODE = 0x20DF10EF;
+#endif
+// --------------------------
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void callback(char* topicChar, byte* payload, unsigned int length) {
+  String t = String(topicChar);
+  String message;
+  for (unsigned int i = 0; i < length; i++) message += (char)payload[i];
+
+  Serial.print("Message arrived [");
+  Serial.print(t);
+  Serial.print("] ");
+  Serial.println(message);
+
+  if (t == String(topic)) {
+    if (message.equalsIgnoreCase("ON")) {
+      turnOnAC();
+    } else if (message.equalsIgnoreCase("OFF")) {
+      turnOffAC();
+    } else {
+      Serial.println("Unknown payload");
+    }
+  }
+}
+
+void setup_wifi() {
+  delay(10);
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+  int tries = 0;
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+    if (++tries > 40) { // timeout
+      Serial.println(" WiFi failed");
+      return;
+    }
+  }
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println(WiFi.localIP());
+}
+
+void reconnect() {
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Create client ID
+    String clientId = "ESP32-AC-";
+    clientId += String(random(0xffff), HEX);
+    if (client.connect(clientId.c_str(), mqtt_user, mqtt_pass)) {
+      Serial.println("connected");
+      client.subscribe(topic);
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      delay(5000);
+    }
+  }
+}
+
+void turnOnAC() {
+  Serial.println("TURN ON AC");
+#ifdef SMART_PLUG_MODE
+  digitalWrite(RELAY_PIN, HIGH); // or LOW depending on wiring
+#endif
+#ifdef IR_MODE
+  // irsend.sendNEC(AC_IR_CODE, 32);
+  // or appropriate protocol call
+#endif
+}
+
+void turnOffAC() {
+  Serial.println("TURN OFF AC");
+#ifdef SMART_PLUG_MODE
+  digitalWrite(RELAY_PIN, LOW); // or HIGH depending on wiring
+#endif
+#ifdef IR_MODE
+  // send IR code for OFF if required
+#endif
+}
+
+void setup() {
+  Serial.begin(115200);
+#ifdef SMART_PLUG_MODE
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, LOW);
+#endif
+#ifdef IR_MODE
+  // irsend.begin();
+#endif
+
+  setup_wifi();
+  client.setServer(mqtt_server, mqtt_port);
+  client.setCallback(callback);
+}
+
+void loop() {
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+}
+curl -X POST https://your-server.example.com/ac/on \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: supersecret" \
+  -d '{"zone":"livingroom"}'

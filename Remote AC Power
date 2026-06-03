@@ -70,7 +70,10 @@ function requireApiKey(req, res, next) {
   const key = req.headers['x-api-key'] || req.query.api_key;
   if (key !== API_KEY) return res.status(401).json({ error: 'Unauthorized' });
   next();
-}
+## Files
+- `server/index.js` — Node.js webhook server that publishes MQTT messages.
+- `esp32/aircon.ino` — ESP32 code (Arduino) that subscribes to MQTT and toggles the AC (via a relay or IR).
+
 
 app.post('/ac/on', requireApiKey, (req, res) => {
   const zone = (req.body.zone || 'default').toString();

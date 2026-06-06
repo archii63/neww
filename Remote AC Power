@@ -52,6 +52,9 @@ client.on('connect', () => {
   console.log('Connected to MQTT broker', MQTT_URL);
 });
 
+## Files
+- `server/index.js` — Node.js webhook server that publishes MQTT messages.
+- `esp32/aircon.ino` — ESP32 code (Arduino) that subscribes to MQTT and toggles the AC (via a relay or IR).
 client.on('error', (err) => {
   console.error('MQTT error', err);
 });

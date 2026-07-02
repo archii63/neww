@@ -42,59 +42,6 @@ const MQTT_PASS = process.env.MQTT_PASS || '';
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.API_KEY || 'supersecret'; // change in prod
 
-const mqttOptions = {};
-if (MQTT_USER) mqttOptions.username = MQTT_USER;
-if (MQTT_PASS) mqttOptions.password = MQTT_PASS;
-
-const client = mqtt.connect(MQTT_URL, mqttOptions);
-
-client.on('connect', () => {
-  console.log('Connected to MQTT broker', MQTT_URL);
-});
-
-## Files
-- `server/index.js` — Node.js webhook server that publishes MQTT messages.
-- `esp32/aircon.ino` — ESP32 code (Arduino) that subscribes to MQTT and toggles the AC (via a relay or IR).
-client.on('error', (err) => {
-  console.error('MQTT error', err);
-});
-
-function publishPower(zone, state) {
-  const topic = `home/ac/${zone}/power`;
-  const payload = state ? 'ON' : 'OFF';
-  client.publish(topic, payload, { qos: 1, retain: false }, (err) => {
-    if (err) console.error('Publish error', err);
-    else console.log(`Published ${payload} -> ${topic}`);
-  });
-}
-
-// Simple auth middleware
-function requireApiKey(req, res, next) {
-  const key = req.headers['x-api-key'] || req.query.api_key;
-  if (key !== API_KEY) return res.status(401).json({ error: 'Unauthorized' });
-  next();
-## Files
-- `server/index.js` — Node.js webhook server that publishes MQTT messages.
-- `esp32/aircon.ino` — ESP32 code (Arduino) that subscribes to MQTT and toggles the AC (via a relay or IR).
-
-
-app.post('/ac/on', requireApiKey, (req, res) => {
-  const zone = (req.body.zone || 'default').toString();
-  publishPower(zone, true);
-  res.json({ status: 'ok', zone, action: 'on' });
-});
-
-app.post('/ac/off', requireApiKey, (req, res) => {
-  const zone = (req.body.zone || 'default').toString();
-  publishPower(zone, false);
-  res.json({ status: 'ok', zone, action: 'off' });
-});
-
-app.get('/', (req, res) => {
-  res.send('AC webhook running');
-});
-
-app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
 // ESP32 MQTT client for turning AC ON/OFF
@@ -222,29 +169,3 @@ void turnOffAC() {
   // send IR code for OFF if required
 #endif
 }
-
-void setup() {
-  Serial.begin(115200);
-#ifdef SMART_PLUG_MODE
-  pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, LOW);
-#endif
-#ifdef IR_MODE
-  // irsend.begin();
-#endif
-
-  setup_wifi();
-  client.setServer(mqtt_server, mqtt_port);
-  client.setCallback(callback);
-}
-
-void loop() {
-  if (!client.connected()) {
-    reconnect();
-  }
-  client.loop();
-}
-curl -X POST https://your-server.example.com/ac/on \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: supersecret" \
-  -d '{"zone":"livingroom"}'
